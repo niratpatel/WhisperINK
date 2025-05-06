@@ -118,4 +118,73 @@ Your goal is to make the listener feel something true. Not impressed—seen.
     }
 };
 
-module.exports = { transformToCinematic };
+async function generateGeminiContentForInsights(promptForGemini, entriesForContext) {
+    if (!model) { // 'model' should be defined from your existing Gemini setup
+      console.error("Gemini AI model is not initialized in aiTransformService.js. Check API Key and setup.");
+      throw new Error("AI model not initialized.");
+    }
+    try {
+      const fullPrompt = `${promptForGemini}\n\nJournal Entries for Context (last 7 days):\n${entriesForContext}`;
+      
+      // console.log("Sending to Gemini (Mood Arc Prompt Snippet):", fullPrompt.substring(0, 300) + "..."); 
+  
+      // Using the retryWithBackoff from your existing code
+      const result = await retryWithBackoff(() => model.generateContent(fullPrompt));
+      const response = await result.response;
+  
+      if (!response || !response.candidates || response.candidates.length === 0 || response.candidates[0].finishReason !== 'STOP') {
+          console.error("Gemini response blocked or incomplete for insights:", JSON.stringify(response, null, 2));
+          const blockReason = response?.candidates?.[0]?.finishReason;
+          let errorMsg = 'AI insight generation failed.';
+          if (blockReason) errorMsg += ` Reason: ${blockReason}.`;
+          throw new Error(errorMsg);
+      }
+  
+      const text = response.text();
+      // console.log("Received from Gemini (Mood Arc Response Snippet):", text.substring(0, 300) + "...");
+      return text;
+    } catch (error) {
+      console.error('Error calling Gemini API for insights:', error.message);
+      throw new Error('Failed to generate AI insight via Gemini.');
+    }
+  }
+  
+  async function getWeeklyMoodArcAndDominantEmotion(entries) {
+    // Prepare the text from entries. We include date and the main content.
+    // Your entries might have 'cinematicEntry' or 'transcribedText'. We'll try to use what's available.
+    const entriesText = entries.map(e => 
+      `Date: ${new Date(e.createdAt).toLocaleDateString()}, Entry: ${e.cinematicEntry || e.transcribedText || 'No textual content.'}`
+    ).join('\n---\n');
+    
+    const prompt = "Based on the following journal entries from the past 7 days, describe the user's overall weekly mood arc (e.g., 'started low, gradually improved', 'consistent with peaks of joy', 'fluctuating with stress points'). Also, identify the single most dominant emotion (e.g., Joy, Sadness, Contemplation, Excitement, Anxiety) experienced throughout the week and briefly explain why. Format your response as a JSON object with two keys: 'moodArcDescription' (a string describing the arc) and 'dominantEmotion' (a string for the emotion name). Example: {\"moodArcDescription\": \"The week showed a steady rise in positive sentiment, culminating in a joyful weekend.\", \"dominantEmotion\": \"Joy\"}.";
+    
+    const geminiResponse = await generateGeminiContentForInsights(prompt, entriesText);
+    
+    try {
+      // Gemini should return a JSON string, so we parse it into an object.
+      let cleanedResponse = geminiResponse.trim();
+      if (cleanedResponse.startsWith('```json')) {
+        cleanedResponse = cleanedResponse.substring(7);
+      }
+      if (cleanedResponse.startsWith('```')) {
+        cleanedResponse = cleanedResponse.substring(3);
+      }
+      if (cleanedResponse.endsWith('```')) {
+        cleanedResponse = cleanedResponse.slice(0, -3);
+      }
+      cleanedResponse = cleanedResponse.trim();
+      return JSON.parse(cleanedResponse);
+    } catch (e) {
+      console.error("Failed to parse Gemini JSON response for mood arc:", e, "\nRaw Gemini Response was:", geminiResponse);
+      // If Gemini doesn't return perfect JSON, we provide a default / error state.
+      return {
+        moodArcDescription: "Insights are brewing! We couldn't quite capture the mood arc this time. Try again shortly.",
+        dominantEmotion: "Mysterious"
+      };
+    }
+  };
+  
+
+module.exports = { transformToCinematic, getWeeklyMoodArcAndDominantEmotion };
+
+

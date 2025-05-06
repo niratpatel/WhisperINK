@@ -22,6 +22,7 @@ const JournalListScreen = ({ navigation }) => {
     const [error, setError] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
     const [deletingId, setDeletingId] = useState(null);
+    const [isDialOpen, setIsDialOpen] = useState(false);
 
     const fetchEntries = useCallback(async () => {
         try {
@@ -149,13 +150,50 @@ const JournalListScreen = ({ navigation }) => {
                     />
                 }
             />
+               
+// With this speed dial implementation:
+<View style={styles.speedDial}>
+  {isDialOpen && (
+    <View style={styles.dialOptions}>
+      {/* Record Option */}
+      <TouchableOpacity 
+        style={styles.dialOption}
+        onPress={() => {
+          setIsDialOpen(false);
+          navigation.navigate('Record');
+        }}
+      >
+
+        <View style={styles.optionButtonCentered}>
+          <Ionicons name="mic-outline" size={24} color="white" />
+        </View>
+      </TouchableOpacity>
+      
+        {/* Insights Option */}
+        <TouchableOpacity 
+            style={styles.dialOption}
+            onPress={() => {
+            setIsDialOpen(false);
+            navigation.navigate('Insights');
+            }}
+        >
             
-            <TouchableOpacity
-                style={styles.addButton}
-                onPress={() => navigation.navigate('Record')}
-            >
-                <Ionicons name="add" size={30} color="white" />
-            </TouchableOpacity>
+            <View style={styles.optionButtonCentered}>
+            <Ionicons name="analytics-outline" size={24} color="white" />
+            </View>
+        </TouchableOpacity>
+        </View>
+    )}
+    
+                {/* Main Button */}
+                <TouchableOpacity
+                    style={[styles.dialMain, isDialOpen && styles.dialMainActive]}
+                    onPress={() => setIsDialOpen(!isDialOpen)}
+                >
+                    <Ionicons name={isDialOpen ? "close" : "book"} size={28} color="white" />
+                </TouchableOpacity>
+                </View>         
+           
         </View>
     );
 };
@@ -224,27 +262,61 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: 'rgba(255, 255, 255, 0.9)',
     },
-    addButton: {
+    // Then add this to the styles object:
+    // Add these to your StyleSheet
+    speedDial: {
         position: 'absolute',
         right: 20,
         bottom: 20,
+        alignItems: 'center',
+    },
+    dialMain: {
         width: 60,
         height: 60,
         borderRadius: 30,
         backgroundColor: '#9c6644',
         justifyContent: 'center',
         alignItems: 'center',
-        ...Platform.select({
-            ios: {
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.3,
-                shadowRadius: 4,
-            },
-            android: {
-                elevation: 5,
-            },
-        }),
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+    },
+    dialMainActive: {
+        backgroundColor: '#7d5236', // Darker shade when active
+    },
+    dialOptions: {
+        marginBottom: 12,
+        alignItems: 'center'
+    },
+    dialOption: {
+        marginBottom: 16,
+    },
+    optionLabel: {
+        backgroundColor: 'rgba(0,0,0,0.7)',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 4,
+        marginRight: 8,
+    },
+    optionText: {
+        color: 'white',
+        fontFamily: 'Lato-Regular',
+        fontSize: 14,
+    },
+    optionButtonCentered: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        backgroundColor: '#A1887F',
+        justifyContent: 'center',
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 3,
+        elevation: 3,
     },
     errorBanner: {
         backgroundColor: '#d32f2f',

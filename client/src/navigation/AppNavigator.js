@@ -4,6 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import JournalListScreen from '../screens/JournalListScreen';
 import RecordScreen from '../screens/RecordScreen';
 import EntryDetailScreen from '../screens/EntryDetailScreen';
+import InsightsScreen from '../screens/InsightsScreen';
 
 const Stack = createStackNavigator();
 
@@ -25,6 +26,7 @@ const AppNavigator = () => {
       <Stack.Screen name="JournalList" component={JournalListScreen} options={{ title: 'WhisperInk' }} />
       <Stack.Screen name="Record" component={RecordScreen} options={{ title: 'Record Thoughts' }}/>
       <Stack.Screen name="EntryDetail" component={EntryDetailScreen} options={({ route }) => ({ title: route.params?.entry?.bookTitle || 'Journal Entry', })} />
+      <Stack.Screen name="Insights" component={InsightsScreen} options={{ title: 'Your Insights' }} />
     </Stack.Navigator>
   );
 };

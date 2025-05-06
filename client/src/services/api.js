@@ -15,29 +15,45 @@ const WEB_DEV_API_URL = 'http://localhost:5001/api';
 const NATIVE_DEV_API_URL = 'http://192.168.1.5:5001/api';
 
 // URL for deployed production backend (replace later)
-const PRODUCTION_API_URL = 'http://192.168.1.5:5001/api';
+const PRODUCTION_API_URL = 'https://whisperink-backend.onrender.com/api';
 
 // --- Determine Correct URL ---
-let finalApiUrl;
+let finalApiUrl
+
+const USE_LOCAL_API = false; // Set this to false to use production API
+
+if (USE_LOCAL_API) {
+  // Use local API based on platform
+  if (Platform.OS === 'web') {
+    finalApiUrl = WEB_DEV_API_URL;
+  } else {
+    finalApiUrl = NATIVE_DEV_API_URL;
+  }
+} else {
+  // Use production API
+  finalApiUrl = PRODUCTION_API_URL;
+}
+
+console.log(`Connecting to API (${Platform.OS}):`, finalApiUrl);
 // Check if we're running in a development client (development build)
-const isDevClient = Constants.appOwnership === 'standalone' && __DEV__;
+//const isDevClient = Constants.appOwnership === 'standalone' && __DEV__;
 
 // Modified logic to handle development builds correctly
-if (process.env.NODE_ENV === 'production' && !isDevClient) {
+//if (process.env.NODE_ENV === 'production' && !isDevClient) {
   // True production build
-  finalApiUrl = PRODUCTION_API_URL;
-} else {
+  //finalApiUrl = PRODUCTION_API_URL;
+//} else {
   // Development environment (including dev client builds)
-  if (Platform.OS === 'web') {
-    finalApiUrl = WEB_DEV_API_URL; // Use localhost for web dev
-  } else {
-    finalApiUrl = NATIVE_DEV_API_URL; // Use LAN IP for native dev
-  }
-}
+  //if (Platform.OS === 'web') {
+    //finalApiUrl = WEB_DEV_API_URL; // Use localhost for web dev
+  //} else {
+    //finalApiUrl = NATIVE_DEV_API_URL; // Use LAN IP for native dev
+  //}
+//}
 
 // Log the final URL being used for verification
 // Update this line
-console.log(`Connecting to API (${Platform.OS} - ${process.env.NODE_ENV} - DevClient: ${isDevClient} - AppOwnership: ${Constants.appOwnership || 'undefined'}):`, finalApiUrl);
+//console.log(`Connecting to API (${Platform.OS} - ${process.env.NODE_ENV} - DevClient: ${isDevClient} - AppOwnership: ${Constants.appOwnership || 'undefined'}):`, finalApiUrl);
 
 // --- Create Axios Instance ---
 const apiClient = axios.create({
@@ -106,6 +122,34 @@ export const deleteJournalEntry = async (entryId) => {
       throw new Error(message);
   }
 }
+
+export const getJournalInsights = async () => {
+  try {
+    const response = await apiClient.get('/journal-entries/insights');
+    return response.data;
+  } catch (error) {
+    console.error(
+      'API Error fetching insights:',
+      error.response?.status,
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+export const getAIInsights = async () => {
+  try {
+    const response = await apiClient.get('/journal-entries/ai-insights');
+    return response.data;
+  } catch (error) {
+    console.error(
+      'API Error fetching AI insights:',
+      error.response?.status,
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
 
 // --- Default Export ---
 // Note: No need for default export if you only export named functions

@@ -1,5 +1,7 @@
 // server/controllers/journalController.js
 const JournalEntry = require('../models/JournalEntry');
+const AIInsight = require('../models/AIInsights');
+const aiService = require('../services/aiTransformService');
 const { transcribeAudio } = require('../services/transcriptionService'); // Using the exported direct upload function
 const aiTransformService = require('../services/aiTransformService');
 const mongoose = require('mongoose'); // Add this import for ObjectId validation
@@ -115,3 +117,104 @@ exports.deleteEntry = async (req, res, next) => {
   }
 };
 // --- END ADD DELETE Function ---
+
+// ... existing code ...
+
+// Generate insights from journal entries
+exports.getInsights = async (req, res, next) => {
+  try {
+    // Get all entries
+    const entries = await JournalEntry.find().sort({ createdAt: -1 });
+    
+    if (!entries || entries.length === 0) {
+      return res.status(200).json({
+        moodDistribution: {},
+        commonThemes: [],
+        activityPatterns: {},
+        writingTrends: {}
+      });
+    }
+    
+    // Calculate mood distribution
+    const moodDistribution = {};
+    entries.forEach(entry => {
+      const mood = entry.mood || 'unspecified';
+      moodDistribution[mood] = (moodDistribution[mood] || 0) + 1;
+    });
+    
+    // Extract common themes (simplified version - in production, use AI for this)
+    const commonThemes = [];
+    // This is a placeholder - in a real implementation, you would use 
+    // your existing AI service to analyze text and extract themes
+    if (entries.length >= 3) {
+      commonThemes.push(
+        { name: 'Reflection', count: Math.floor(entries.length * 0.7) },
+        { name: 'Growth', count: Math.floor(entries.length * 0.5) },
+        { name: 'Creativity', count: Math.floor(entries.length * 0.3) }
+      );
+    }
+    
+    // Calculate activity patterns by day of week
+    const activityPatterns = {};
+    entries.forEach(entry => {
+      const date = new Date(entry.createdAt);
+      const dayOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][date.getDay()];
+      activityPatterns[dayOfWeek] = (activityPatterns[dayOfWeek] || 0) + 1;
+    });
+    
+    // Analyze writing trends over time
+    const writingTrends = {};
+    entries.forEach(entry => {
+      const date = new Date(entry.createdAt);
+      const month = date.toLocaleString('default', { month: 'long' });
+      writingTrends[month] = (writingTrends[month] || 0) + 1;
+    });
+    
+    // Return insights
+    res.status(200).json({
+      moodDistribution,
+      commonThemes,
+      activityPatterns,
+      writingTrends,
+      entryCount: entries.length
+    });
+    
+  } catch (error) {
+    console.error('Error generating insights:', error);
+    next(error);
+  }
+};
+
+exports.getAIInsights = async (req, res) => {
+  try {
+    // const userId = req.user.id; // Placeholder for when you have user authentication
+
+    const latestInsight = await AIInsight.findOne({
+      // user: userId, // Uncomment when user auth is in place
+      insightType: 'weeklyMoodArc' // Ensure we get the correct type of insight
+    }).sort({ generatedAt: -1 }); // Get the most recently generated one
+
+    if (!latestInsight) {
+      return res.status(404).json({
+        message: 'No AI insights available yet. Journal more to unlock them, or check back soon!',
+        moodAnalysis: null // Keep a consistent response structure
+      });
+    }
+
+    // Send the content of the insight
+    res.json({
+      message: 'Successfully retrieved AI insights.', 
+      moodAnalysis: latestInsight.content,
+      generatedAt: latestInsight.generatedAt, // You might want to send this to the frontend
+      periodStartDate: latestInsight.periodStartDate,
+      periodEndDate: latestInsight.periodEndDate
+    });
+
+  } catch (error) {
+    console.error('Error in getAIInsights controller (fetching stored):', error);
+    res.status(500).json({
+      message: 'Oops! Failed to retrieve AI insights from the database.',
+      moodAnalysis: null
+    });
+  }
+};
