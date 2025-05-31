@@ -5,7 +5,7 @@ const AIInsightSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    // required: true, // Make true when you have users, for now it's optional
+    required: true, // Now required since we have user accounts
   },
   insightType: {
     type: String,

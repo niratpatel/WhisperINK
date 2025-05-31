@@ -5,6 +5,7 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 require('./jobs/scheduler');
 const journalRoutes = require('./routes/journalEntries');
+const authRoutes = require('./routes/auth');
 
 dotenv.config();
 connectDB();
@@ -19,6 +20,7 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 app.use('/api/journal-entries', journalRoutes);
+app.use('/api/auth', authRoutes);
 
 // Global Error Handler (Place after routes)
 app.use((err, req, res, next) => {

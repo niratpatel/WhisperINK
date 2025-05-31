@@ -151,7 +151,7 @@ const JournalListScreen = ({ navigation }) => {
                 }
             />
                
-// With this speed dial implementation:
+
 <View style={styles.speedDial}>
   {isDialOpen && (
     <View style={styles.dialOptions}>
@@ -163,36 +163,34 @@ const JournalListScreen = ({ navigation }) => {
           navigation.navigate('Record');
         }}
       >
-
         <View style={styles.optionButtonCentered}>
           <Ionicons name="mic-outline" size={24} color="white" />
         </View>
       </TouchableOpacity>
       
-        {/* Insights Option */}
-        <TouchableOpacity 
-            style={styles.dialOption}
-            onPress={() => {
-            setIsDialOpen(false);
-            navigation.navigate('Insights');
-            }}
-        >
-            
-            <View style={styles.optionButtonCentered}>
-            <Ionicons name="analytics-outline" size={24} color="white" />
-            </View>
-        </TouchableOpacity>
+      {/* Insights Option */}
+      <TouchableOpacity 
+        style={styles.dialOption}
+        onPress={() => {
+          setIsDialOpen(false);
+          navigation.navigate('Insights');
+        }}
+      >
+        <View style={styles.optionButtonCentered}>
+          <Ionicons name="analytics-outline" size={24} color="white" />
         </View>
-    )}
-    
-                {/* Main Button */}
-                <TouchableOpacity
-                    style={[styles.dialMain, isDialOpen && styles.dialMainActive]}
-                    onPress={() => setIsDialOpen(!isDialOpen)}
-                >
-                    <Ionicons name={isDialOpen ? "close" : "book"} size={28} color="white" />
-                </TouchableOpacity>
-                </View>         
+      </TouchableOpacity>
+    </View>
+  )}
+  
+  {/* Main Button */}
+  <TouchableOpacity
+    style={[styles.dialMain, isDialOpen && styles.dialMainActive]}
+    onPress={() => setIsDialOpen(!isDialOpen)}
+  >
+    <Ionicons name={isDialOpen ? "close" : "book"} size={28} color="white" />
+  </TouchableOpacity>
+</View>         
            
         </View>
     );
@@ -262,8 +260,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: 'rgba(255, 255, 255, 0.9)',
     },
-    // Then add this to the styles object:
-    // Add these to your StyleSheet
+
     speedDial: {
         position: 'absolute',
         right: 20,

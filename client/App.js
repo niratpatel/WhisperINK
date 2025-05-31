@@ -6,6 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useFonts, Lora_400Regular, Lora_400Regular_Italic } from '@expo-google-fonts/lora';
 import { Lato_400Regular, Lato_700Bold } from '@expo-google-fonts/lato';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { UserProvider } from './src/context/UserContext';
 
 
 export default function App() {
@@ -27,10 +28,12 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer>
-      <StatusBar style="light" />
-      <AppNavigator />
-    </NavigationContainer>
+    <UserProvider>
+      <NavigationContainer>
+        <StatusBar style="light" />
+        <AppNavigator />
+      </NavigationContainer>
+    </UserProvider>
   );
 }
 

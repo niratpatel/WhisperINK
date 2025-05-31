@@ -1,9 +1,8 @@
-
-
 // client/src/services/api.js
 import axios from 'axios';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native'; // <-- IMPORT PLATFORM
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // --- Define Backend URLs ---
 
@@ -20,7 +19,7 @@ const PRODUCTION_API_URL = 'https://whisperink-backend.onrender.com/api';
 // --- Determine Correct URL ---
 let finalApiUrl
 
-const USE_LOCAL_API = false; // Set this to false to use production API
+const USE_LOCAL_API = true; // Set this to false to use production API
 
 if (USE_LOCAL_API) {
   // Use local API based on platform
@@ -58,6 +57,15 @@ console.log(`Connecting to API (${Platform.OS}):`, finalApiUrl);
 // --- Create Axios Instance ---
 const apiClient = axios.create({
   baseURL: finalApiUrl, // Use the determined URL
+});
+
+// Add request interceptor to attach token
+apiClient.interceptors.request.use(async (config) => {
+  const token = await AsyncStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 // --- API Functions (remain the same) ---
@@ -149,6 +157,21 @@ export const getAIInsights = async () => {
     );
     throw error;
   }
+};
+
+export const login = async (email, password) => {
+  const response = await apiClient.post('/auth/login', { email, password });
+  return response.data;
+};
+
+export const register = async (email, password, displayName) => {
+  const response = await apiClient.post('/auth/register', { email, password, displayName });
+  return response.data;
+};
+
+export const getCurrentUser = async () => {
+  const response = await apiClient.get('/auth/me');
+  return response.data;
 };
 
 // --- Default Export ---

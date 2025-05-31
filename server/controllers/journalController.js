@@ -9,10 +9,12 @@ const mongoose = require('mongoose'); // Add this import for ObjectId validation
 // GET entries function remains the same
 exports.getEntries = async (req, res, next) => {
   try {
-    const entries = await JournalEntry.find().sort({ createdAt: -1 });
+    // Ensure userId is always an ObjectId
+    const userId = typeof req.userId === 'string' ? new mongoose.Types.ObjectId(req.userId) : req.userId;
+    const entries = await JournalEntry.find({ user: userId }).sort({ createdAt: -1 });
     res.status(200).json(entries);
   } catch (error) {
-    console.error('Error fetching entries:', erwror);
+    console.error('Error fetching entries:', error);
     next(error);
   }
 };
@@ -57,6 +59,7 @@ exports.createEntry = async (req, res, next) => {
       bookTitle: bookTitle || 'Untitled Book',
       bookAuthor: bookAuthor || 'Unknown Author',
       mood: mood || '', // Save mood to database
+      user: req.userId
     });
     await newEntry.save();
     console.log('Entry saved:', newEntry._id);
@@ -116,15 +119,13 @@ exports.deleteEntry = async (req, res, next) => {
     next(error); // Pass to global error handler
   }
 };
-// --- END ADD DELETE Function ---
-
-// ... existing code ...
+// --- END ADD DELETE FUNCTION ---
 
 // Generate insights from journal entries
 exports.getInsights = async (req, res, next) => {
   try {
-    // Get all entries
-    const entries = await JournalEntry.find().sort({ createdAt: -1 });
+    const userId = typeof req.userId === 'string' ? new mongoose.Types.ObjectId(req.userId) : req.userId;
+    const entries = await JournalEntry.find({ user: userId }).sort({ createdAt: -1 });
     
     if (!entries || entries.length === 0) {
       return res.status(200).json({
@@ -187,11 +188,10 @@ exports.getInsights = async (req, res, next) => {
 
 exports.getAIInsights = async (req, res) => {
   try {
-    // const userId = req.user.id; // Placeholder for when you have user authentication
-
+    const userId = typeof req.userId === 'string' ? new mongoose.Types.ObjectId(req.userId) : req.userId;
     const latestInsight = await AIInsight.findOne({
-      // user: userId, // Uncomment when user auth is in place
-      insightType: 'weeklyMoodArc' // Ensure we get the correct type of insight
+      user: userId,
+      insightType: 'weeklyMoodArc'
     }).sort({ generatedAt: -1 }); // Get the most recently generated one
 
     if (!latestInsight) {

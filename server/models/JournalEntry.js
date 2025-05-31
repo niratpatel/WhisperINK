@@ -33,6 +33,11 @@ const JournalEntrySchema = new mongoose.Schema(
       enum: ['contemplative', 'inspired', 'confused', 'seeking', ''], // Valid moods + empty
       default: '',
     },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    },
   },
   {
     timestamps: true,

@@ -13,6 +13,7 @@
     "@expo-google-fonts/lora": "^0.3.0",
     "@expo/metro-runtime": "~5.0.4",
     "@expo/vector-icons": "^14.1.0",
+    "@react-native-async-storage/async-storage": "^2.1.2",
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/stack": "^6.3.29",
     "axios": "^1.9.0",
@@ -26,6 +27,7 @@
     "expo-linear-gradient": "^14.1.4",
     "expo-speech": "~13.1.6",
     "expo-status-bar": "~2.2.3",
+    "expo-updates": "~0.28.12",
     "nativewind": "^4.1.23",
     "react": "19.0.0",
     "react-dom": "19.0.0",
@@ -35,8 +37,7 @@
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.10.0",
     "react-native-svg": "15.11.2",
-    "react-native-web": "^0.20.0",
-    "expo-updates": "~0.28.12"
+    "react-native-web": "^0.20.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
