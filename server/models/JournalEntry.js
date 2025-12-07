@@ -27,14 +27,14 @@ const JournalEntrySchema = new mongoose.Schema(
       trim: true,
       default: 'Unknown Author',
     },
-    // Add mood field - includes all moods from theme
+    // Mood field - matches client theme.js moodConfig
     mood: {
       type: String,
       enum: [
-        // New theme moods
-        'calm', 'happy', 'sad', 'anxious', 'excited', 'grateful', 'angry', 'neutral',
+        // Moods from theme.js moodConfig
+        'happy', 'calm', 'reflective', 'energetic', 'grateful', 'anxious', 'sad', 'excited',
         // Legacy moods for backward compatibility
-        'contemplative', 'inspired', 'confused', 'seeking',
+        'contemplative', 'inspired', 'confused', 'seeking', 'angry', 'neutral',
         '' // Allow empty
       ],
       default: '',
