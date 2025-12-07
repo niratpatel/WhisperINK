@@ -12,7 +12,7 @@ const WEB_DEV_API_URL = 'http://localhost:5001/api';
 
 // URL for testing on mobile device (Expo Go accessing local backend via LAN IP)
 // --- IMPORTANT: Replace YOUR_COMPUTER_IP with your actual local network IP ---
-const NATIVE_DEV_API_URL = 'http://192.168.1.5:5001/api';
+const NATIVE_DEV_API_URL = 'http://192.168.1.12:5001/api';
 
 // URL for deployed production backend (replace later)
 const PRODUCTION_API_URL = 'https://whisperink-backend.onrender.com/api';
@@ -40,15 +40,15 @@ console.log(`Connecting to API (${Platform.OS}):`, finalApiUrl);
 
 // Modified logic to handle development builds correctly
 //if (process.env.NODE_ENV === 'production' && !isDevClient) {
-  // True production build
-  //finalApiUrl = PRODUCTION_API_URL;
+// True production build
+//finalApiUrl = PRODUCTION_API_URL;
 //} else {
-  // Development environment (including dev client builds)
-  //if (Platform.OS === 'web') {
-    //finalApiUrl = WEB_DEV_API_URL; // Use localhost for web dev
-  //} else {
-    //finalApiUrl = NATIVE_DEV_API_URL; // Use LAN IP for native dev
-  //}
+// Development environment (including dev client builds)
+//if (Platform.OS === 'web') {
+//finalApiUrl = WEB_DEV_API_URL; // Use localhost for web dev
+//} else {
+//finalApiUrl = NATIVE_DEV_API_URL; // Use LAN IP for native dev
+//}
 //}
 
 // Log the final URL being used for verification
@@ -73,7 +73,7 @@ export const getJournalEntries = async (filters = {}) => {
     );
     // Check if it's the HTML response again
     if (typeof error.response?.data === 'string' && error.response.data.includes('<html')) {
-        console.error("!!! STILL RECEIVING HTML - Check API URL configuration and ensure backend server is running on the correct port (5001?) and accessible !!!");
+      console.error("!!! STILL RECEIVING HTML - Check API URL configuration and ensure backend server is running on the correct port (5001?) and accessible !!!");
     }
     throw error; // Re-throw to be caught by the calling component
   }
@@ -95,7 +95,7 @@ export const createJournalEntry = async (formData) => {
     );
     // Check if it's the HTML response again
     if (typeof error.response?.data === 'string' && error.response.data.includes('<html')) {
-         console.error("!!! STILL RECEIVING HTML - Check API URL configuration and ensure backend server is running on the correct port (5001?) and accessible !!!");
+      console.error("!!! STILL RECEIVING HTML - Check API URL configuration and ensure backend server is running on the correct port (5001?) and accessible !!!");
     }
     throw error;
   }
@@ -104,22 +104,22 @@ export const createJournalEntry = async (formData) => {
 // --- ADD Delete Function ---
 export const deleteJournalEntry = async (entryId) => {
   if (!entryId) {
-      throw new Error("Entry ID is required for deletion.");
+    throw new Error("Entry ID is required for deletion.");
   }
   console.log(`Attempting to delete entry: ${entryId}`);
   try {
-      // Use the DELETE HTTP method
-      const response = await apiClient.delete(`/journal-entries/${entryId}`);
-      return response.data; // Should return { success: true, data: {} }
+    // Use the DELETE HTTP method
+    const response = await apiClient.delete(`/journal-entries/${entryId}`);
+    return response.data; // Should return { success: true, data: {} }
   } catch (error) {
-      console.error(
-          'API Error deleting entry:', entryId,
-          error.response?.status,
-          error.response?.data || error.message
-      );
-      // Re-throw a more specific message if possible
-      const message = error.response?.data?.message || error.message || 'Failed to delete entry.';
-      throw new Error(message);
+    console.error(
+      'API Error deleting entry:', entryId,
+      error.response?.status,
+      error.response?.data || error.message
+    );
+    // Re-throw a more specific message if possible
+    const message = error.response?.data?.message || error.message || 'Failed to delete entry.';
+    throw new Error(message);
   }
 }
 

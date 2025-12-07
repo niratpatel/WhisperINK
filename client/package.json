@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "cross-env REACT_NATIVE_PACKAGER_HOSTNAME=192.168.1.5 expo start",
-    "android": "cross-env REACT_NATIVE_PACKAGER_HOSTNAME=192.168.1.5 expo start --android",
-    "ios": "cross-env REACT_NATIVE_PACKAGER_HOSTNAME=192.168.1.5 expo start --ios",
+    "start": "cross-env REACT_NATIVE_PACKAGER_HOSTNAME=10.143.213.253 expo start",
+    "android": "cross-env REACT_NATIVE_PACKAGER_HOSTNAME=10.143.213.253 expo start --android",
+    "ios": "cross-env REACT_NATIVE_PACKAGER_HOSTNAME=10.143.213.253 expo start --ios",
     "web": "expo start --web"
   },
   "dependencies": {
