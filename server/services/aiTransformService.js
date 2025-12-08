@@ -47,50 +47,50 @@ const transformToCinematic = async (transcription, bookTitle = '', bookAuthor = 
     return "No thoughts were recorded or transcribed for this entry.";
   }
 
-  let prompt = `You are a deeply empathetic and masterful screenwriter with the sensitivity of a novelist and the emotional precision of a Pixar storyteller.
-Your task is to take a raw, unedited transcript of a speaker's internal thoughts or spoken reflections and transform it into a cinematic, emotionally resonant internal monologue or dialogue.
+  let prompt = `You are a thoughtful editor who helps people capture their spoken thoughts in written form.
 
-Instructions:
+Your task is to take a raw transcript of someone's spoken words and clean it up into a polished, readable journal entry.
 
-Capture the emotional essence. Your goal is not to summarize but to feel what the speaker feels—draw out their longings, doubts, moments of clarity, and emotional truths.
+CRITICAL RULES:
+1. ONLY use content that appears in the transcription. Do NOT invent, add, or imagine any details, events, thoughts, or feelings that are not explicitly stated.
+2. If the transcription is brief or fragmented, keep your output brief. Do not expand or elaborate beyond what was said.
+3. Keep the speaker's authentic voice and word choices. Refine grammar and flow, but preserve their unique way of expressing themselves.
+4. Remove filler words (um, uh, like, you know) and false starts, but keep the core message intact.
+5. If something is unclear in the transcription, leave it out rather than guessing what they meant.
 
-Write in a grounded, human, cinematic style—as if the words are being spoken in a transformative scene of a film, or narrated by a character on the edge of growth, realization, or vulnerability.
+Style Guidelines:
+- Write in first person (I, me, my) as if the speaker is writing
+- Use natural, conversational language - not overly poetic or dramatic
+- Organize scattered thoughts into a coherent flow
+- Keep it honest and grounded - this is their real experience
 
-Use clean, honest language. Avoid over-dramatic metaphors or poetic fluff unless they arise naturally from the emotion. The power should come from clarity, truth, and subtle imagery—not ornamentation.
-
-Evoke deep connection. The final monologue should feel like a gentle revelation. It should be the kind of thing a listener hears and feels seen by, as if someone finally put into words what they couldn't express.
-
-Do NOT include the speaker's name, date, or journal entry formatting. This is not a diary or a blog. This is a soul-level voiceover, fit for a life-changing film moment or a novel's emotional turning point.
-
-Output only the final monologue—no explanations, no summaries, no notes. Just the dialogue itself, fully formed.
-
-Your goal is to make the listener feel something true. Not impressed—seen.
+The goal is to help them see their own thoughts clearly reflected back, not to create fiction or embellishment.
 
 `;
 
   if (bookTitle) {
-    prompt += `\n\nThe reflections likely pertain to the book "${bookTitle}"`;
+    prompt += `\n\nNote: The speaker may reference a book titled "${bookTitle}"`;
     if (bookAuthor) {
       prompt += ` by ${bookAuthor}`;
     }
-    prompt += `. Weave in the atmosphere or themes of this book subtly if appropriate and possible based on the transcription content, but don't force it if the transcription doesn't provide clear links.`;
+    prompt += `. Only include book references if they actually appear in the transcription.`;
   }
 
   // Add mood context if provided
   if (mood) {
     const moodContexts = {
-      contemplative: "The speaker is in a contemplative mood, reflecting deeply and thoughtfully on their experience. Capture this introspective, philosophical quality in your transformation.",
-      inspired: "The speaker is feeling inspired and energized by their thoughts. Infuse the transformation with a sense of possibility, discovery, and creative energy.",
-      confused: "The speaker is processing confusion or uncertainty. Acknowledge this state while finding moments of clarity or questions worth exploring within their thoughts.",
-      seeking: "The speaker is actively seeking answers or understanding. Frame their thoughts as part of a meaningful search or journey toward insight."
+      contemplative: "The speaker tagged this as 'contemplative' - maintain any reflective tone present.",
+      inspired: "The speaker tagged this as 'inspired' - preserve any enthusiasm they expressed.",
+      confused: "The speaker tagged this as 'confused' - it's okay if the entry reflects uncertainty.",
+      seeking: "The speaker tagged this as 'seeking' - honor any questions or searching in their words."
     };
 
     if (moodContexts[mood]) {
-      prompt += `\n\nImportant context about the speaker's current state: ${moodContexts[mood]}`;
+      prompt += `\n\n${moodContexts[mood]}`;
     }
   }
 
-  prompt += `\n\nRaw Transcription:\n---\n${transcription}\n---\n\nCinematic Journal Entry:`;
+  prompt += `\n\nRaw Transcription:\n---\n${transcription}\n---\n\nPolished Journal Entry (stay faithful to what was said):`;
 
   console.log("Sending prompt to Gemini...");
 

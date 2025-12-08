@@ -82,7 +82,7 @@ exports.deleteEntry = async (req, res, next) => {
 
     // Optional: Validate if the ID is a valid MongoDB ObjectId format
     if (!mongoose.Types.ObjectId.isValid(entryId)) {
-        return res.status(400).json({ success: false, message: 'Invalid entry ID format' });
+      return res.status(400).json({ success: false, message: 'Invalid entry ID format' });
     }
 
     const entry = await JournalEntry.findById(entryId);
@@ -118,6 +118,54 @@ exports.deleteEntry = async (req, res, next) => {
 };
 // --- END ADD DELETE Function ---
 
+// --- ADD UPDATE Entry Function ---
+// @desc    Update a journal entry
+// @route   PUT /api/journal-entries/:id
+// @access  Public (adjust if auth needed)
+exports.updateEntry = async (req, res, next) => {
+  try {
+    const entryId = req.params.id;
+    const updates = req.body;
+
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(entryId)) {
+      return res.status(400).json({ success: false, message: 'Invalid entry ID format' });
+    }
+
+    // Find and update the entry
+    const entry = await JournalEntry.findById(entryId);
+
+    if (!entry) {
+      return res.status(404).json({ success: false, message: 'Journal entry not found' });
+    }
+
+    // Only allow updating certain fields
+    const allowedUpdates = ['bookTitle', 'bookAuthor', 'mood', 'cinematicEntry'];
+    const updateData = {};
+
+    for (const key of allowedUpdates) {
+      if (updates[key] !== undefined) {
+        updateData[key] = updates[key];
+      }
+    }
+
+    // Apply updates
+    const updatedEntry = await JournalEntry.findByIdAndUpdate(
+      entryId,
+      updateData,
+      { new: true, runValidators: true }
+    );
+
+    console.log(`Updated journal entry: ${entryId}`, updateData);
+    res.status(200).json({ success: true, data: updatedEntry });
+
+  } catch (error) {
+    console.error('Error updating entry:', error);
+    next(error);
+  }
+};
+// --- END ADD UPDATE Function ---
+
 // ... existing code ...
 
 // Generate insights from journal entries
@@ -125,7 +173,7 @@ exports.getInsights = async (req, res, next) => {
   try {
     // Get all entries
     const entries = await JournalEntry.find().sort({ createdAt: -1 });
-    
+
     if (!entries || entries.length === 0) {
       return res.status(200).json({
         moodDistribution: {},
@@ -134,14 +182,14 @@ exports.getInsights = async (req, res, next) => {
         writingTrends: {}
       });
     }
-    
+
     // Calculate mood distribution
     const moodDistribution = {};
     entries.forEach(entry => {
       const mood = entry.mood || 'unspecified';
       moodDistribution[mood] = (moodDistribution[mood] || 0) + 1;
     });
-    
+
     // Extract common themes (simplified version - in production, use AI for this)
     const commonThemes = [];
     // This is a placeholder - in a real implementation, you would use 
@@ -153,7 +201,7 @@ exports.getInsights = async (req, res, next) => {
         { name: 'Creativity', count: Math.floor(entries.length * 0.3) }
       );
     }
-    
+
     // Calculate activity patterns by day of week
     const activityPatterns = {};
     entries.forEach(entry => {
@@ -161,7 +209,7 @@ exports.getInsights = async (req, res, next) => {
       const dayOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][date.getDay()];
       activityPatterns[dayOfWeek] = (activityPatterns[dayOfWeek] || 0) + 1;
     });
-    
+
     // Analyze writing trends over time
     const writingTrends = {};
     entries.forEach(entry => {
@@ -169,7 +217,7 @@ exports.getInsights = async (req, res, next) => {
       const month = date.toLocaleString('default', { month: 'long' });
       writingTrends[month] = (writingTrends[month] || 0) + 1;
     });
-    
+
     // Return insights
     res.status(200).json({
       moodDistribution,
@@ -178,7 +226,7 @@ exports.getInsights = async (req, res, next) => {
       writingTrends,
       entryCount: entries.length
     });
-    
+
   } catch (error) {
     console.error('Error generating insights:', error);
     next(error);
@@ -203,7 +251,7 @@ exports.getAIInsights = async (req, res) => {
 
     // Send the content of the insight
     res.json({
-      message: 'Successfully retrieved AI insights.', 
+      message: 'Successfully retrieved AI insights.',
       moodAnalysis: latestInsight.content,
       generatedAt: latestInsight.generatedAt, // You might want to send this to the frontend
       periodStartDate: latestInsight.periodStartDate,

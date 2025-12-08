@@ -19,8 +19,7 @@ router.get('/insights', journalController.getInsights);
 // ADD THE NEW AI INSIGHTS ROUTE
 router.get('/ai-insights', getAIInsights);
 
-// GET, PUT single entry routes (add later if needed)
-// router.get('/:id', journalController.getEntryById);
-// router.put('/:id', journalController.updateEntry);
+// PUT update entry by ID
+router.put('/:id', journalController.updateEntry);
 
 module.exports = router;
